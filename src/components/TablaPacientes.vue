@@ -24,14 +24,16 @@
           <!-- Paciente -->
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
-              <div class="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-parchment border-2 border-border">
+              <!-- Avatar: breed photo or paw fallback -->
+              <div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-parchment border-2 border-border flex items-center justify-center">
                 <img
-                  :src="`https://placedog.net/80/80?id=${dogImgId(p.id)}`"
-                  :alt="p.nombre"
+                  v-if="breedPhotos[photoKey(p)]"
+                  :src="breedPhotos[photoKey(p)]"
+                  :alt="p.raza"
                   class="w-full h-full object-cover"
                   loading="lazy"
-                  @error="onImgError($event)"
                 />
+                <PawPrint v-else class="w-5 h-5 text-border" />
               </div>
               <div>
                 <div class="font-semibold text-ink text-sm">{{ p.nombre }}</div>
@@ -81,39 +83,47 @@
 </template>
 
 <script setup>
-import { Pencil, Trash2 } from 'lucide-vue-next'
+import { ref, watch } from 'vue'
+import { Pencil, Trash2, PawPrint } from 'lucide-vue-next'
+import { getDogPhoto } from '../services/dogPhotos.js'
 
-defineProps({
+const props = defineProps({
   pacientes:    { type: Array,                  required: true },
   eliminandoId: { type: [Number, String, null], default: null },
 })
 defineEmits(['editar', 'eliminar'])
 
-/* placedog.net supports ?id=1..330 for consistent images */
-function dogImgId(id) {
-  const n = parseInt(id, 10)
-  return isNaN(n) ? (Math.abs(hashStr(String(id))) % 330) + 1 : (n % 330) + 1
+// key: "breed name lowercase" → URL (or null while loading)
+const breedPhotos = ref({})
+
+function photoKey(p) {
+  return (p.raza ?? '').trim().toLowerCase()
 }
 
-function hashStr(s) {
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0xffffffff
-  return h
+async function loadPhotos(list) {
+  const breeds = [...new Set(list.map(photoKey).filter(Boolean))]
+  await Promise.all(
+    breeds.map(async (breed) => {
+      if (breed in breedPhotos.value) return   // already fetched
+      breedPhotos.value[breed] = null           // mark loading
+      const url = await getDogPhoto(breed)
+      breedPhotos.value[breed] = url            // null if unknown breed
+    })
+  )
 }
 
-function onImgError(e) {
-  e.target.style.display = 'none'
-}
+watch(() => props.pacientes, loadPhotos, { immediate: true })
 
+// ── Status styles ──
 const ESTADOS = {
-  ingresado:    { badge: 'bg-emerald-100 text-emerald-800', dot: 'bg-emerald-500' },
-  'en espera':  { badge: 'bg-amber-100 text-amber-800',    dot: 'bg-amber-400' },
-  'en cirugía': { badge: 'bg-red-100 text-red-800',        dot: 'bg-red-500' },
-  cirugía:      { badge: 'bg-red-100 text-red-800',        dot: 'bg-red-500' },
-  'de alta':    { badge: 'bg-sky-100 text-sky-800',        dot: 'bg-sky-500' },
-  hospitalizado:{ badge: 'bg-purple-100 text-purple-800',  dot: 'bg-purple-500' },
-  seguimiento:  { badge: 'bg-indigo-100 text-indigo-800',  dot: 'bg-indigo-400' },
-  emergencia:   { badge: 'bg-rose-100 text-rose-800',      dot: 'bg-rose-600' },
+  'ingresado':     { badge: 'bg-emerald-100 text-emerald-800', dot: 'bg-emerald-500' },
+  'en espera':     { badge: 'bg-amber-100 text-amber-800',     dot: 'bg-amber-400'   },
+  'en cirugía':    { badge: 'bg-red-100 text-red-800',         dot: 'bg-red-500'     },
+  'cirugía':       { badge: 'bg-red-100 text-red-800',         dot: 'bg-red-500'     },
+  'hospitalizado': { badge: 'bg-purple-100 text-purple-800',   dot: 'bg-purple-500'  },
+  'de alta':       { badge: 'bg-sky-100 text-sky-800',         dot: 'bg-sky-500'     },
+  'seguimiento':   { badge: 'bg-indigo-100 text-indigo-800',   dot: 'bg-indigo-400'  },
+  'emergencia':    { badge: 'bg-rose-100 text-rose-800',       dot: 'bg-rose-600'    },
 }
 const DEFAULT_ESTADO = { badge: 'bg-gray-100 text-gray-600', dot: 'bg-gray-400' }
 
@@ -124,8 +134,7 @@ function estadoStyle(estado = '') {
 function formatDate(val) {
   if (!val) return '—'
   const d = new Date(val)
-  if (isNaN(d)) return val
-  return d.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })
+  return isNaN(d) ? val : d.toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 </script>
 
