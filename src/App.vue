@@ -74,7 +74,7 @@
         </div>
 
         <!-- Add button -->
-        <button class="ml-auto flex items-center gap-2 bg-forest-mid text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-forest transition-colors whitespace-nowrap">
+        <button @click="abrirModalNuevo" class="ml-auto flex items-center gap-2 bg-forest-mid text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-forest transition-colors whitespace-nowrap">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Nuevo Paciente
         </button>
@@ -166,12 +166,13 @@
       </main>
     </div>
 
-    <!-- Edit modal -->
+    <!-- Add / Edit modal -->
     <ModalEditarPaciente
       v-if="pacienteSeleccionado"
       :paciente="pacienteSeleccionado"
       :guardando="guardando"
-      @guardar="guardarEdicion"
+      :modo="modoModal"
+      @guardar="modoModal === 'agregar' ? crearPaciente($event) : guardarEdicion($event)"
       @cancelar="cerrarModal"
     />
 
@@ -227,6 +228,7 @@ const pacientes = ref([])
 const cargando = ref(false)
 const busqueda = ref('')
 const pacienteSeleccionado = ref(null)
+const modoModal = ref('editar')
 const guardando = ref(false)
 const pacienteAEliminar = ref(null)
 const eliminandoId = ref(null)
@@ -255,8 +257,9 @@ async function cargarPacientes() {
   }
 }
 
-function abrirModal(p)  { pacienteSeleccionado.value = { ...p } }
-function cerrarModal()  { pacienteSeleccionado.value = null }
+function abrirModal(p)     { modoModal.value = 'editar';   pacienteSeleccionado.value = { ...p } }
+function abrirModalNuevo() { modoModal.value = 'agregar';  pacienteSeleccionado.value = {} }
+function cerrarModal()     { pacienteSeleccionado.value = null }
 
 async function guardarEdicion(datos) {
   guardando.value = true
@@ -268,6 +271,20 @@ async function guardarEdicion(datos) {
     mostrarAlerta(`"${datos.nombre}" actualizado correctamente.`, 'success')
   } catch (err) {
     mostrarAlerta('Error al guardar: ' + err.message, 'error')
+  } finally {
+    guardando.value = false
+  }
+}
+
+async function crearPaciente(datos) {
+  guardando.value = true
+  try {
+    const nuevo = await pacientesService.create(datos)
+    pacientes.value.push(nuevo)
+    cerrarModal()
+    mostrarAlerta(`"${nuevo.nombre}" registrado correctamente.`, 'success')
+  } catch (err) {
+    mostrarAlerta('Error al registrar: ' + err.message, 'error')
   } finally {
     guardando.value = false
   }

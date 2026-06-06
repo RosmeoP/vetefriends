@@ -20,6 +20,15 @@ export const pacientesService = {
     return handleResponse(res)
   },
 
+  async create(data) {
+    const res = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    return handleResponse(res)
+  },
+
   async update(id, data) {
     const res = await fetch(`${BASE_URL}/${id}`, {
       method: 'PUT',
