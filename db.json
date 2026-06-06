@@ -1,0 +1,85 @@
+{
+  "pacientes": [
+    {
+      "id": "1",
+      "nombre": "Max",
+      "raza": "Golden Retriever",
+      "edad": 4,
+      "peso": 28.5,
+      "propietario": "Carlos Mendoza",
+      "telefono": "555-1001",
+      "estado": "Ingresado",
+      "diagnostico": "Revisión general anual",
+      "ultimaVisita": "2023-10-12"
+    },
+    {
+      "id": "2",
+      "nombre": "Bella",
+      "raza": "Beagle",
+      "edad": 2,
+      "peso": 12.2,
+      "propietario": "Ana Torres",
+      "telefono": "555-1002",
+      "estado": "En espera",
+      "diagnostico": "Vacunación pendiente",
+      "ultimaVisita": "2023-09-28"
+    },
+    {
+      "id": "3",
+      "nombre": "Cooper",
+      "raza": "Labrador Retriever",
+      "edad": 6,
+      "peso": 32,
+      "propietario": "Luis Ramírez",
+      "telefono": "555-1003",
+      "estado": "Cirugía",
+      "diagnostico": "Operación de ligamento cruzado",
+      "ultimaVisita": "2023-10-15"
+    },
+    {
+      "id": "4",
+      "nombre": "Luna",
+      "raza": "Poodle",
+      "edad": 3,
+      "peso": 8,
+      "propietario": "Sofía Herrera",
+      "telefono": "555-1004",
+      "estado": "Ingresado",
+      "diagnostico": "Dermatitis leve",
+      "ultimaVisita": "2023-10-01"
+    },
+    {
+      "id": "5",
+      "nombre": "Rocky",
+      "raza": "Bulldog Francés",
+      "edad": 1,
+      "peso": 10.5,
+      "propietario": "Pedro Vega",
+      "telefono": "555-1005",
+      "estado": "En espera",
+      "diagnostico": "Primera consulta",
+      "ultimaVisita": "2023-10-20"
+    },
+    {
+      "nombre": "Prueba",
+      "raza": "Dálmata",
+      "edad": 2,
+      "peso": 15,
+      "propietario": "Test",
+      "estado": "En espera",
+      "id": "sGBL7XqZM2I"
+    },
+    {
+      "nombre": "Canela",
+      "raza": "Chihuahua",
+      "edad": 5,
+      "peso": 15,
+      "propietario": "Dianne y Lizzy",
+      "telefono": "77442947",
+      "estado": "Saludable",
+      "diagnostico": "Rutina de chequeo",
+      "id": "Jw_Hbu_6Dgk"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

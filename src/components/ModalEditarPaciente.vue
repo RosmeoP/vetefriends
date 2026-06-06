@@ -1,23 +1,39 @@
 <template>
-  <div class="fixed inset-0 bg-black/45 flex items-center justify-center z-50"
+  <div class="fixed inset-0 bg-black/45 flex items-center justify-center z-50 overflow-y-auto py-6"
     @click.self="$emit('cancelar')">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl" role="dialog" aria-modal="true">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl mx-4" role="dialog" aria-modal="true">
       <h2 class="text-lg font-extrabold text-ink mb-6">
         {{ modo === 'agregar' ? 'Nuevo Paciente' : 'Editar Paciente' }}
       </h2>
 
       <form @submit.prevent="guardar" class="space-y-4">
-        <div v-for="field in fields" :key="field.id" class="flex flex-col gap-1">
+
+        <!-- Text / number inputs -->
+        <div v-for="field in textFields" :key="field.id" class="flex flex-col gap-1">
           <label :for="field.id" class="text-xs font-bold text-ink-muted uppercase tracking-wide">
             {{ field.label }}
           </label>
-          <textarea v-if="field.type === 'textarea'"
-            :id="field.id" v-model="form[field.model]" rows="3"
-            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors resize-none" />
-          <input v-else
+          <input
             :id="field.id" :type="field.type" v-model="form[field.model]"
-            :min="field.min" :required="field.required"
+            :min="field.min" :step="field.step" :required="field.required"
             class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors" />
+        </div>
+
+        <!-- Estado (select) -->
+        <div class="flex flex-col gap-1">
+          <label for="estado" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Estado</label>
+          <select id="estado" v-model="form.estado"
+            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors appearance-none">
+            <option value="">— Sin estado —</option>
+            <option v-for="e in estados" :key="e" :value="e">{{ e }}</option>
+          </select>
+        </div>
+
+        <!-- Diagnóstico -->
+        <div class="flex flex-col gap-1">
+          <label for="diagnostico" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Diagnóstico</label>
+          <textarea id="diagnostico" v-model="form.diagnostico" rows="3"
+            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors resize-none" />
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -41,19 +57,27 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   paciente:  { type: Object,  required: true },
   guardando: { type: Boolean, default: false },
-  modo:      { type: String,  default: 'editar' }, // 'editar' | 'agregar'
+  modo:      { type: String,  default: 'editar' },
 })
 const emit = defineEmits(['guardar', 'cancelar'])
 
-const fields = [
-  { id: 'nombre',      label: 'Nombre',       model: 'nombre',      type: 'text',     required: true },
-  { id: 'raza',        label: 'Raza',         model: 'raza',        type: 'text',     required: true },
-  { id: 'edad',        label: 'Edad (años)',  model: 'edad',        type: 'number',   required: true, min: 0 },
-  { id: 'peso',        label: 'Peso (kg)',    model: 'peso',        type: 'number',   min: 0 },
-  { id: 'propietario', label: 'Propietario',  model: 'propietario', type: 'text',     required: true },
-  { id: 'telefono',    label: 'Teléfono',     model: 'telefono',    type: 'tel' },
-  { id: 'estado',      label: 'Estado',       model: 'estado',      type: 'text' },
-  { id: 'diagnostico', label: 'Diagnóstico',  model: 'diagnostico', type: 'textarea' },
+const estados = [
+  'Ingresado',
+  'En espera',
+  'En cirugía',
+  'Hospitalizado',
+  'De alta',
+  'Seguimiento',
+  'Emergencia',
+]
+
+const textFields = [
+  { id: 'nombre',      label: 'Nombre',      model: 'nombre',      type: 'text',   required: true },
+  { id: 'raza',        label: 'Raza',        model: 'raza',        type: 'text',   required: true },
+  { id: 'edad',        label: 'Edad (años)', model: 'edad',        type: 'number', required: true, min: 0 },
+  { id: 'peso',        label: 'Peso (kg)',   model: 'peso',        type: 'number', min: 0, step: 0.1 },
+  { id: 'propietario', label: 'Propietario', model: 'propietario', type: 'text',   required: true },
+  { id: 'telefono',    label: 'Teléfono',    model: 'telefono',    type: 'tel' },
 ]
 
 const form = ref({ ...props.paciente })
