@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import perroRoutes from "./routes/perro.routes.js";
 import propietarioRoutes from "./routes/propietario.routes.js";
 import historialRoutes from "./routes/historial.routes.js";
+import citaRoutes from "./routes/cita.routes.js";
 
 // Configurar variables de entorno - Especificar la ruta explícitamente
 const envPath = resolve(process.cwd(), ".env");
@@ -33,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/perros", perroRoutes);
 app.use("/api/propietarios", propietarioRoutes);
 app.use("/api/historiales", historialRoutes);
+app.use("/api/citas", citaRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
