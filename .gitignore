@@ -14,6 +14,14 @@ dist-ssr
 coverage
 *.local
 
+# Environment variables — never commit secrets (any app in the monorepo)
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
