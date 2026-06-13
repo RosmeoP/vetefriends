@@ -58,6 +58,32 @@
           </section>
         </div>
 
+        <!-- Citas del paciente -->
+        <section class="bg-white border border-border rounded-xl overflow-hidden mb-6">
+          <div class="flex items-center gap-2 px-5 py-4 border-b border-border">
+            <CalendarDays class="w-4 h-4 text-forest-mid" />
+            <h2 class="text-sm font-bold text-ink uppercase tracking-wide">Citas</h2>
+            <span class="text-xs text-ink-muted">({{ citas.length }})</span>
+          </div>
+
+          <div v-if="citas.length === 0" class="text-center py-8 text-ink-muted text-sm">
+            Sin citas registradas. Agéndalas desde la sección <strong>Citas</strong>.
+          </div>
+          <ul v-else class="divide-y divide-border">
+            <li v-for="c in citas" :key="c.id" class="px-5 py-3 flex items-center gap-4 flex-wrap">
+              <span class="text-xs font-bold text-forest-mid bg-forest-mid/10 px-2 py-0.5 rounded whitespace-nowrap">
+                {{ formatDate(c.fecha) }} · {{ c.hora }}
+              </span>
+              <span class="font-semibold text-ink text-sm flex-1 min-w-0">{{ c.motivo }}</span>
+              <span class="text-xs text-ink-muted">{{ c.veterinario || '—' }}</span>
+              <span :class="estadoCitaStyle(c.estado)"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                {{ c.estado || 'Sin estado' }}
+              </span>
+            </li>
+          </ul>
+        </section>
+
         <!-- Historial clínico -->
         <section class="bg-white border border-border rounded-xl overflow-hidden">
           <div class="flex items-center justify-between px-5 py-4 border-b border-border">
@@ -147,10 +173,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ArrowLeft, PawPrint, UserRound, ClipboardPlus, Plus, Pencil, Trash2 } from 'lucide-vue-next'
+import { ArrowLeft, PawPrint, UserRound, ClipboardPlus, CalendarDays, Plus, Pencil, Trash2 } from 'lucide-vue-next'
 import { pacientesService } from '../services/pacientesService.js'
 import { propietariosService } from '../services/propietariosService.js'
 import { historialesService } from '../services/historialesService.js'
+import { citasService } from '../services/citasService.js'
 import ModalEditarHistorial from './ModalEditarHistorial.vue'
 import AlertMessage from './AlertMessage.vue'
 
@@ -162,6 +189,7 @@ defineEmits(['volver'])
 const mascota = ref(null)
 const propietario = ref(null)
 const historiales = ref([])
+const citas = ref([])
 const cargando = ref(false)
 const cargandoHist = ref(false)
 
@@ -183,12 +211,27 @@ async function cargar() {
         propietario.value = await propietariosService.getById(mascota.value.propietarioId)
       } catch { /* owner record may not exist; fall back to name */ }
     }
+    // This pet's appointments (filtered from the full list — no extra endpoint needed)
+    try {
+      const todas = await citasService.getAll()
+      citas.value = todas.filter((c) => c.pacienteId === props.mascotaId)
+    } catch { citas.value = [] }
     await cargarHistoriales()
   } catch (err) {
     mostrarAlerta('No se pudo cargar la información. ' + err.message, 'error')
   } finally {
     cargando.value = false
   }
+}
+
+const ESTADOS_CITA = {
+  'programada': 'bg-sky-100 text-sky-800',
+  'confirmada': 'bg-emerald-100 text-emerald-800',
+  'completada': 'bg-indigo-100 text-indigo-800',
+  'cancelada':  'bg-red-100 text-red-800',
+}
+function estadoCitaStyle(estado = '') {
+  return ESTADOS_CITA[estado.toLowerCase()] ?? 'bg-gray-100 text-gray-600'
 }
 
 async function cargarHistoriales() {
