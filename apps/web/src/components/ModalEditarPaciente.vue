@@ -16,7 +16,13 @@
           <input
             :id="field.id" :type="field.type" v-model="form[field.model]"
             :min="field.min" :step="field.step" :required="field.required"
-            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors" />
+            :placeholder="field.placeholder ?? ''"
+            @blur="tocar(field.model)"
+            :class="['border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:bg-white transition-colors',
+              errores[field.model] && tocados[field.model] ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-forest-mid']" />
+          <p v-if="errores[field.model] && tocados[field.model]" class="text-xs text-red-500">
+            {{ errores[field.model] }}
+          </p>
         </div>
 
         <!-- Propietario (select — referencia) -->
@@ -46,6 +52,7 @@
         <div class="flex flex-col gap-1">
           <label for="diagnostico" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Diagnóstico</label>
           <textarea id="diagnostico" v-model="form.diagnostico" rows="3"
+            placeholder="Ej: Gastroenteritis aguda, en tratamiento con antibióticos..."
             class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors resize-none" />
         </div>
 
@@ -65,13 +72,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps({
-  paciente:   { type: Object,  required: true },
-  propietarios: { type: Array, default: () => [] },
-  guardando:  { type: Boolean, default: false },
-  modo:       { type: String,  default: 'editar' },
+  paciente:     { type: Object,  required: true },
+  propietarios: { type: Array,   default: () => [] },
+  guardando:    { type: Boolean, default: false },
+  modo:         { type: String,  default: 'editar' },
 })
 const emit = defineEmits(['guardar', 'cancelar'])
 
@@ -86,14 +93,52 @@ const estados = [
 ]
 
 const textFields = [
-  { id: 'nombre',      label: 'Nombre',      model: 'nombre',      type: 'text',   required: true },
-  { id: 'raza',        label: 'Raza',        model: 'raza',        type: 'text',   required: true },
-  { id: 'edad',        label: 'Edad (años)', model: 'edad',        type: 'number', required: true, min: 0 },
-  { id: 'peso',        label: 'Peso (kg)',   model: 'peso',        type: 'number', min: 0, step: 0.1 },
+  { id: 'nombre', label: 'Nombre',      model: 'nombre', type: 'text',   required: true, placeholder: 'Ej: Max' },
+  { id: 'raza',   label: 'Raza',        model: 'raza',   type: 'text',   required: true, placeholder: 'Ej: Labrador Retriever' },
+  { id: 'edad',   label: 'Edad (años)', model: 'edad',   type: 'number', required: true, min: 0, placeholder: 'Ej: 3' },
+  { id: 'peso',   label: 'Peso (kg)',   model: 'peso',   type: 'number', min: 0, step: 0.1, placeholder: 'Ej: 12.5' },
 ]
 
 const form = ref({ ...props.paciente })
-watch(() => props.paciente, (v) => { form.value = { ...v } })
+const tocados = ref({})
+watch(() => props.paciente, (v) => { form.value = { ...v }; tocados.value = {} })
 
-function guardar() { emit('guardar', { ...form.value }) }
+function tocar(model) { tocados.value[model] = true }
+
+const errores = computed(() => {
+  const f = form.value
+  const e = {}
+
+  if (!f.nombre?.trim())
+    e.nombre = 'El nombre es requerido.'
+  else if (f.nombre.trim().length < 2)
+    e.nombre = 'El nombre debe tener al menos 2 caracteres.'
+
+  if (!f.raza?.trim())
+    e.raza = 'La raza es requerida.'
+  else if (f.raza.trim().length < 2)
+    e.raza = 'La raza debe tener al menos 2 caracteres.'
+
+  if (f.edad === '' || f.edad === null || f.edad === undefined)
+    e.edad = 'La edad es requerida.'
+  else if (Number(f.edad) < 0)
+    e.edad = 'La edad no puede ser negativa.'
+  else if (Number(f.edad) > 30)
+    e.edad = 'Verifica la edad ingresada.'
+
+  if (f.peso !== '' && f.peso !== null && f.peso !== undefined) {
+    if (Number(f.peso) < 0)
+      e.peso = 'El peso no puede ser negativo.'
+    else if (Number(f.peso) > 200)
+      e.peso = 'Verifica el peso ingresado.'
+  }
+
+  return e
+})
+
+function guardar() {
+  textFields.forEach(f => { tocados.value[f.model] = true })
+  if (Object.keys(errores.value).length > 0) return
+  emit('guardar', { ...form.value })
+}
 </script>

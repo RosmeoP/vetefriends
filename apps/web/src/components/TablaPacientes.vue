@@ -24,16 +24,9 @@
           <!-- Paciente -->
           <td class="px-4 py-3">
             <div class="flex items-center gap-3">
-              <!-- Avatar: breed photo or paw fallback -->
-              <div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-parchment border-2 border-border flex items-center justify-center">
-                <img
-                  v-if="breedPhotos[photoKey(p)]"
-                  :src="breedPhotos[photoKey(p)]"
-                  :alt="p.raza"
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-                <PawPrint v-else class="w-5 h-5 text-border" />
+              <!-- Avatar -->
+              <div class="w-10 h-10 rounded-full flex-shrink-0 bg-parchment border-2 border-border flex items-center justify-center">
+                <PawPrint class="w-5 h-5 text-border" />
               </div>
               <div>
                 <div class="font-semibold text-ink text-sm">{{ p.nombre }}</div>
@@ -87,36 +80,13 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
 import { Eye, Pencil, Trash2, PawPrint } from 'lucide-vue-next'
-import { getDogPhoto } from '../services/dogPhotos.js'
 
 const props = defineProps({
   pacientes:    { type: Array,                  required: true },
   eliminandoId: { type: [Number, String, null], default: null },
 })
 defineEmits(['ver', 'editar', 'eliminar'])
-
-// key: "breed name lowercase" → URL (or null while loading)
-const breedPhotos = ref({})
-
-function photoKey(p) {
-  return (p.raza ?? '').trim().toLowerCase()
-}
-
-async function loadPhotos(list) {
-  const breeds = [...new Set(list.map(photoKey).filter(Boolean))]
-  await Promise.all(
-    breeds.map(async (breed) => {
-      if (breed in breedPhotos.value) return   // already fetched
-      breedPhotos.value[breed] = null           // mark loading
-      const url = await getDogPhoto(breed)
-      breedPhotos.value[breed] = url            // null if unknown breed
-    })
-  )
-}
-
-watch(() => props.pacientes, loadPhotos, { immediate: true })
 
 // ── Status styles ──
 const ESTADOS = {

@@ -15,7 +15,12 @@
             :id="field.id" :type="field.type" v-model="form[field.model]" :required="field.required"
             :placeholder="field.placeholder ?? ''"
             :maxlength="field.maxlength ?? undefined"
-            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors" />
+            @blur="tocar(field.model)"
+            :class="['border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:bg-white transition-colors',
+              errores[field.model] && tocados[field.model] ? 'border-red-400 focus:border-red-400' : 'border-border focus:border-forest-mid']" />
+          <p v-if="errores[field.model] && tocados[field.model]" class="text-xs text-red-500">
+            {{ errores[field.model] }}
+          </p>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -34,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps({
   propietario: { type: Object,  required: true },
@@ -63,7 +68,47 @@ function normalizar(p) {
 }
 
 const form = ref(normalizar(props.propietario))
-watch(() => props.propietario, (v) => { form.value = normalizar(v) })
+const tocados = ref({})
+watch(() => props.propietario, (v) => { form.value = normalizar(v); tocados.value = {} })
 
-function guardar() { emit('guardar', { ...form.value }) }
+function tocar(model) { tocados.value[model] = true }
+
+const errores = computed(() => {
+  const f = form.value
+  const e = {}
+
+  if (!f.nombreCompleto.trim())
+    e.nombreCompleto = 'El nombre es requerido.'
+  else if (f.nombreCompleto.trim().length < 3)
+    e.nombreCompleto = 'El nombre debe tener al menos 3 caracteres.'
+
+  if (!f.dui.trim())
+    e.dui = 'El DUI es requerido.'
+  else if (!/^\d{8}-\d$/.test(f.dui.trim()))
+    e.dui = 'Formato inválido. Usa: 01234567-8'
+
+  if (!f.telefono.trim())
+    e.telefono = 'El teléfono es requerido.'
+  else if (!/^\d{4}-\d{4}$/.test(f.telefono.trim()))
+    e.telefono = 'Formato inválido. Usa: 7123-4567'
+
+  if (!f.correo.trim())
+    e.correo = 'El correo es requerido.'
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.correo.trim()))
+    e.correo = 'Ingresa un correo válido.'
+
+  if (!f.direccion.trim())
+    e.direccion = 'La dirección es requerida.'
+  else if (f.direccion.trim().length < 5)
+    e.direccion = 'La dirección debe tener al menos 5 caracteres.'
+
+  return e
+})
+
+function guardar() {
+  // Mark all fields as touched to show all errors
+  fields.forEach(f => { tocados.value[f.model] = true })
+  if (Object.keys(errores.value).length > 0) return
+  emit('guardar', { ...form.value })
+}
 </script>
