@@ -66,6 +66,10 @@
           <!-- Acciones -->
           <td class="px-4 py-3">
             <div class="flex items-center gap-2">
+              <button @click="$emit('ver', p)" title="Ver detalle"
+                class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                <Eye class="w-3.5 h-3.5" />
+              </button>
               <button @click="$emit('editar', p)" title="Editar"
                 class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
                 <Pencil class="w-3.5 h-3.5" />
@@ -84,14 +88,14 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import { Pencil, Trash2, PawPrint } from 'lucide-vue-next'
+import { Eye, Pencil, Trash2, PawPrint } from 'lucide-vue-next'
 import { getDogPhoto } from '../services/dogPhotos.js'
 
 const props = defineProps({
   pacientes:    { type: Array,                  required: true },
   eliminandoId: { type: [Number, String, null], default: null },
 })
-defineEmits(['editar', 'eliminar'])
+defineEmits(['ver', 'editar', 'eliminar'])
 
 // key: "breed name lowercase" → URL (or null while loading)
 const breedPhotos = ref({})

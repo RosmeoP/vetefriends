@@ -56,6 +56,7 @@
           v-else
           :pacientes="pacientesFiltrados"
           :eliminando-id="eliminandoId"
+          @ver="$emit('ver-detalle', $event)"
           @editar="abrirModal"
           @eliminar="confirmarEliminar"
         />
@@ -110,6 +111,7 @@
     <ModalEditarPaciente
       v-if="pacienteSeleccionado"
       :paciente="pacienteSeleccionado"
+      :propietarios="propietarios"
       :guardando="guardando"
       :modo="modoModal"
       @guardar="modoModal === 'agregar' ? crearPaciente($event) : guardarEdicion($event)"
@@ -146,9 +148,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { Search, Plus, Filter, Download, Stethoscope, Syringe, PawPrint } from 'lucide-vue-next'
 import { pacientesService } from '../services/pacientesService.js'
+import { propietariosService } from '../services/propietariosService.js'
 import TablaPacientes from './TablaPacientes.vue'
 import ModalEditarPaciente from './ModalEditarPaciente.vue'
 import AlertMessage from './AlertMessage.vue'
+
+defineEmits(['ver-detalle'])
 
 const tabs = [
   { key: 'all',       label: 'Todos' },
@@ -158,6 +163,7 @@ const tabs = [
 const tabActiva = ref('all')
 
 const pacientes = ref([])
+const propietarios = ref([])
 const cargando = ref(false)
 const busqueda = ref('')
 const pacienteSeleccionado = ref(null)
@@ -182,7 +188,12 @@ const pacientesFiltrados = computed(() => {
 async function cargarPacientes() {
   cargando.value = true
   try {
-    pacientes.value = await pacientesService.getAll()
+    const [listaPacientes, listaPropietarios] = await Promise.all([
+      pacientesService.getAll(),
+      propietariosService.getAll(),
+    ])
+    pacientes.value = listaPacientes
+    propietarios.value = listaPropietarios
   } catch (err) {
     mostrarAlerta('No se pudo cargar la lista. ' + err.message, 'error')
   } finally {

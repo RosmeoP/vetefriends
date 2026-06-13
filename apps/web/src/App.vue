@@ -23,6 +23,10 @@
           :class="vistaActiva === 'citas' && 'nav-item-active'" class="nav-item">
           <CalendarDays class="w-4 h-4 flex-shrink-0" /> Citas
         </button>
+        <button type="button" @click="vistaActiva = 'propietarios'"
+          :class="vistaActiva === 'propietarios' && 'nav-item-active'" class="nav-item">
+          <Users class="w-4 h-4 flex-shrink-0" /> Propietarios
+        </button>
         <a href="#" class="nav-item">
           <ClipboardPlus class="w-4 h-4 flex-shrink-0" /> Historial Médico
         </a>
@@ -45,8 +49,14 @@
     </aside>
 
     <!-- ── Active section ── -->
-    <PacientesView v-if="vistaActiva === 'pacientes'" />
+    <PacientesView v-if="vistaActiva === 'pacientes'" @ver-detalle="abrirDetalle" />
     <CitasView v-else-if="vistaActiva === 'citas'" />
+    <PropietariosView v-else-if="vistaActiva === 'propietarios'" />
+    <DetalleMascota
+      v-else-if="vistaActiva === 'detalle-mascota'"
+      :mascota-id="mascotaDetalleId"
+      @volver="vistaActiva = 'pacientes'"
+    />
 
   </div>
 </template>
@@ -55,12 +65,20 @@
 import { ref } from 'vue'
 import {
   Dog, LayoutDashboard, PawPrint, CalendarDays, ClipboardPlus,
-  Package, Settings2, LifeBuoy, LogOut,
+  Package, Settings2, LifeBuoy, LogOut, Users,
 } from 'lucide-vue-next'
 import PacientesView from './components/PacientesView.vue'
 import CitasView from './components/CitasView.vue'
+import PropietariosView from './components/PropietariosView.vue'
+import DetalleMascota from './components/DetalleMascota.vue'
 
 const vistaActiva = ref('pacientes')
+const mascotaDetalleId = ref(null)
+
+function abrirDetalle(mascota) {
+  mascotaDetalleId.value = mascota.id
+  vistaActiva.value = 'detalle-mascota'
+}
 </script>
 
 <style>

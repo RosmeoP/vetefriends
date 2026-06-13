@@ -18,19 +18,27 @@ async function handleResponse(res) {
 function fromApi(perro) {
   if (!perro) return perro
   const { _id, dueño, propietario, createdAt, ...rest } = perro
+  // `propietario` is a reference; the API returns it populated (an object)
+  const propObj = propietario && typeof propietario === 'object' ? propietario : null
   return {
     id: _id,
-    // Owner name comes from `dueño`; fall back to `propietario` only if it's a plain string
-    propietario: dueño ?? (typeof propietario === 'string' ? propietario : ''),
+    propietarioId: propObj ? propObj._id : (typeof propietario === 'string' ? propietario : ''),
+    // Display name: prefer the referenced owner, fall back to legacy free-text `dueño`
+    propietario: propObj ? propObj.nombreCompleto : (dueño ?? ''),
+    dueño: dueño ?? '',
     created_at: createdAt,
     ...rest, // nombre, raza, edad, peso, telefono, estado, diagnostico, ultimaVisita
   }
 }
 
 function toApi(paciente) {
-  // Strip UI-only keys; the owner name maps back to `dueño`
-  const { id, propietario, created_at, ...rest } = paciente
-  return { ...rest, dueño: propietario }
+  // Strip UI-only display keys; send the propietario reference (id)
+  const { id, propietario, propietarioId, dueño, created_at, ...rest } = paciente
+  return {
+    ...rest, // nombre, raza, edad, peso, telefono, estado, diagnostico, ultimaVisita
+    propietario: propietarioId || null,
+    dueño: dueño ?? '',
+  }
 }
 
 // create/update respond with { message, data }; read returns the doc directly

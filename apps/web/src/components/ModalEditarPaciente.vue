@@ -19,6 +19,19 @@
             class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors" />
         </div>
 
+        <!-- Propietario (select — referencia) -->
+        <div class="flex flex-col gap-1">
+          <label for="propietario" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Propietario</label>
+          <select id="propietario" v-model="form.propietarioId"
+            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors appearance-none">
+            <option value="">— Sin asignar —</option>
+            <option v-for="p in propietarios" :key="p.id" :value="p.id">{{ p.nombreCompleto }}</option>
+          </select>
+          <p v-if="propietarios.length === 0" class="text-xs text-amber-600">
+            No hay propietarios. Regístralos en la sección Propietarios para poder asignarlos.
+          </p>
+        </div>
+
         <!-- Estado (select) -->
         <div class="flex flex-col gap-1">
           <label for="estado" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Estado</label>
@@ -55,9 +68,10 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  paciente:  { type: Object,  required: true },
-  guardando: { type: Boolean, default: false },
-  modo:      { type: String,  default: 'editar' },
+  paciente:   { type: Object,  required: true },
+  propietarios: { type: Array, default: () => [] },
+  guardando:  { type: Boolean, default: false },
+  modo:       { type: String,  default: 'editar' },
 })
 const emit = defineEmits(['guardar', 'cancelar'])
 
@@ -76,7 +90,6 @@ const textFields = [
   { id: 'raza',        label: 'Raza',        model: 'raza',        type: 'text',   required: true },
   { id: 'edad',        label: 'Edad (años)', model: 'edad',        type: 'number', required: true, min: 0 },
   { id: 'peso',        label: 'Peso (kg)',   model: 'peso',        type: 'number', min: 0, step: 0.1 },
-  { id: 'propietario', label: 'Propietario', model: 'propietario', type: 'text',   required: true },
   { id: 'telefono',    label: 'Teléfono',    model: 'telefono',    type: 'tel' },
 ]
 
