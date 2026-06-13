@@ -12,9 +12,10 @@
       </div>
 
       <nav class="flex-1 py-3">
-        <a href="#" class="nav-item">
+        <button type="button" @click="vistaActiva = 'dashboard'"
+          :class="vistaActiva === 'dashboard' && 'nav-item-active'" class="nav-item">
           <LayoutDashboard class="w-4 h-4 flex-shrink-0" /> Dashboard
-        </a>
+        </button>
         <button type="button" @click="vistaActiva = 'pacientes'"
           :class="vistaActiva === 'pacientes' && 'nav-item-active'" class="nav-item">
           <PawPrint class="w-4 h-4 flex-shrink-0" /> Pacientes
@@ -42,9 +43,10 @@
       </nav>
 
       <div class="py-3 border-t border-forest-border">
-        <a href="#" class="nav-item">
+        <button type="button" @click="vistaActiva = 'soporte'"
+          :class="vistaActiva === 'soporte' && 'nav-item-active'" class="nav-item">
           <LifeBuoy class="w-4 h-4 flex-shrink-0" /> Soporte
-        </a>
+        </button>
         <a href="#" class="nav-item">
           <LogOut class="w-4 h-4 flex-shrink-0" /> Cerrar sesión
         </a>
@@ -52,12 +54,14 @@
     </aside>
 
     <!-- ── Active section ── -->
-    <PacientesView v-if="vistaActiva === 'pacientes'" @ver-detalle="abrirDetalle" />
+    <DashboardView v-if="vistaActiva === 'dashboard'" @navegar="vistaActiva = $event" />
+    <PacientesView v-else-if="vistaActiva === 'pacientes'" @ver-detalle="abrirDetalle" />
     <CitasView v-else-if="vistaActiva === 'citas'" />
     <PropietariosView v-else-if="vistaActiva === 'propietarios'" />
     <HistorialMedicoView v-else-if="vistaActiva === 'historial'" />
     <InventarioView v-else-if="vistaActiva === 'inventario'" />
     <ConfiguracionView v-else-if="vistaActiva === 'configuracion'" />
+    <SoporteView v-else-if="vistaActiva === 'soporte'" />
     <DetalleMascota
       v-else-if="vistaActiva === 'detalle-mascota'"
       :mascota-id="mascotaDetalleId"
@@ -73,12 +77,14 @@ import {
   Dog, LayoutDashboard, PawPrint, CalendarDays, ClipboardPlus,
   Package, Settings2, LifeBuoy, LogOut, Users,
 } from 'lucide-vue-next'
+import DashboardView from './components/DashboardView.vue'
 import PacientesView from './components/PacientesView.vue'
 import CitasView from './components/CitasView.vue'
 import PropietariosView from './components/PropietariosView.vue'
 import HistorialMedicoView from './components/HistorialMedicoView.vue'
 import InventarioView from './components/InventarioView.vue'
 import ConfiguracionView from './components/ConfiguracionView.vue'
+import SoporteView from './components/SoporteView.vue'
 import DetalleMascota from './components/DetalleMascota.vue'
 
 const vistaActiva = ref('pacientes')
