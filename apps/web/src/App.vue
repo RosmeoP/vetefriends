@@ -31,12 +31,14 @@
           :class="vistaActiva === 'historial' && 'nav-item-active'" class="nav-item">
           <ClipboardPlus class="w-4 h-4 flex-shrink-0" /> Historial Médico
         </button>
-        <a href="#" class="nav-item">
+        <button type="button" @click="vistaActiva = 'inventario'"
+          :class="vistaActiva === 'inventario' && 'nav-item-active'" class="nav-item">
           <Package class="w-4 h-4 flex-shrink-0" /> Inventario
-        </a>
-        <a href="#" class="nav-item">
+        </button>
+        <button type="button" @click="vistaActiva = 'configuracion'"
+          :class="vistaActiva === 'configuracion' && 'nav-item-active'" class="nav-item">
           <Settings2 class="w-4 h-4 flex-shrink-0" /> Configuración
-        </a>
+        </button>
       </nav>
 
       <div class="py-3 border-t border-forest-border">
@@ -54,6 +56,8 @@
     <CitasView v-else-if="vistaActiva === 'citas'" />
     <PropietariosView v-else-if="vistaActiva === 'propietarios'" />
     <HistorialMedicoView v-else-if="vistaActiva === 'historial'" />
+    <InventarioView v-else-if="vistaActiva === 'inventario'" />
+    <ConfiguracionView v-else-if="vistaActiva === 'configuracion'" />
     <DetalleMascota
       v-else-if="vistaActiva === 'detalle-mascota'"
       :mascota-id="mascotaDetalleId"
@@ -73,6 +77,8 @@ import PacientesView from './components/PacientesView.vue'
 import CitasView from './components/CitasView.vue'
 import PropietariosView from './components/PropietariosView.vue'
 import HistorialMedicoView from './components/HistorialMedicoView.vue'
+import InventarioView from './components/InventarioView.vue'
+import ConfiguracionView from './components/ConfiguracionView.vue'
 import DetalleMascota from './components/DetalleMascota.vue'
 
 const vistaActiva = ref('pacientes')

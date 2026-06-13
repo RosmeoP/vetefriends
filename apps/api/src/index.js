@@ -7,6 +7,8 @@ import perroRoutes from "./routes/perro.routes.js";
 import propietarioRoutes from "./routes/propietario.routes.js";
 import historialRoutes from "./routes/historial.routes.js";
 import citaRoutes from "./routes/cita.routes.js";
+import productoRoutes from "./routes/producto.routes.js";
+import configuracionRoutes from "./routes/configuracion.routes.js";
 
 // Configurar variables de entorno - Especificar la ruta explícitamente
 const envPath = resolve(process.cwd(), ".env");
@@ -35,6 +37,8 @@ app.use("/api/perros", perroRoutes);
 app.use("/api/propietarios", propietarioRoutes);
 app.use("/api/historiales", historialRoutes);
 app.use("/api/citas", citaRoutes);
+app.use("/api/inventario", productoRoutes);
+app.use("/api/configuracion", configuracionRoutes);
 
 // Ruta de prueba
 app.get("/", (req, res) => {
