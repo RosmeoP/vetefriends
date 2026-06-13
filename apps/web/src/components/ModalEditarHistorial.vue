@@ -7,6 +7,18 @@
       </h2>
 
       <form @submit.prevent="guardar" class="space-y-4">
+        <!-- Mascota (solo en la pantalla global de Historial Médico) -->
+        <div v-if="pedirMascota" class="flex flex-col gap-1">
+          <label for="mascota" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Mascota</label>
+          <select id="mascota" v-model="form.mascotaId" required
+            class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors appearance-none">
+            <option value="" disabled>— Selecciona una mascota —</option>
+            <option v-for="m in mascotas" :key="m.id" :value="m.id">
+              {{ m.nombre }}{{ m.raza ? ` · ${m.raza}` : '' }}
+            </option>
+          </select>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div class="flex flex-col gap-1">
             <label for="fecha" class="text-xs font-bold text-ink-muted uppercase tracking-wide">Fecha</label>
@@ -57,9 +69,11 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  historial: { type: Object,  required: true },
-  guardando: { type: Boolean, default: false },
-  modo:      { type: String,  default: 'editar' },
+  historial:    { type: Object,  required: true },
+  mascotas:     { type: Array,   default: () => [] },
+  pedirMascota: { type: Boolean, default: false },
+  guardando:    { type: Boolean, default: false },
+  modo:         { type: String,  default: 'editar' },
 })
 const emit = defineEmits(['guardar', 'cancelar'])
 
@@ -70,6 +84,7 @@ function normalizar(h) {
     diagnostico: h.diagnostico ?? '',
     tratamiento: h.tratamiento ?? '',
     veterinario: h.veterinario ?? '',
+    mascotaId:   h.mascotaId ?? '',
     id:          h.id,
   }
 }

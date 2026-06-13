@@ -1,5 +1,16 @@
 import HistorialClinico from '../models/HistorialClinico.js';
 
+export const getHistoriales = async (req, res) => {
+  try {
+    const historiales = await HistorialClinico.find()
+      .populate('mascota')
+      .sort({ fechaConsulta: -1 });
+    res.status(200).json(historiales);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getHistorialesByMascota = async (req, res) => {
   const { mascotaId } = req.params;
   try {

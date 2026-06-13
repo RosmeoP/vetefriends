@@ -35,7 +35,6 @@
               <div><dt class="text-ink-muted text-xs">Edad</dt><dd class="text-ink font-semibold">{{ mascota.edad != null ? mascota.edad + ' año' + (mascota.edad !== 1 ? 's' : '') : '—' }}</dd></div>
               <div><dt class="text-ink-muted text-xs">Peso</dt><dd class="text-ink font-semibold">{{ mascota.peso ? mascota.peso + ' kg' : '—' }}</dd></div>
               <div><dt class="text-ink-muted text-xs">Estado</dt><dd class="text-ink font-semibold">{{ mascota.estado || '—' }}</dd></div>
-              <div><dt class="text-ink-muted text-xs">Teléfono</dt><dd class="text-ink font-semibold">{{ mascota.telefono || '—' }}</dd></div>
               <div class="col-span-2"><dt class="text-ink-muted text-xs">Diagnóstico</dt><dd class="text-ink font-semibold">{{ mascota.diagnostico || '—' }}</dd></div>
             </dl>
           </section>

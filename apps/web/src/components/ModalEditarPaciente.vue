@@ -90,7 +90,6 @@ const textFields = [
   { id: 'raza',        label: 'Raza',        model: 'raza',        type: 'text',   required: true },
   { id: 'edad',        label: 'Edad (años)', model: 'edad',        type: 'number', required: true, min: 0 },
   { id: 'peso',        label: 'Peso (kg)',   model: 'peso',        type: 'number', min: 0, step: 0.1 },
-  { id: 'telefono',    label: 'Teléfono',    model: 'telefono',    type: 'tel' },
 ]
 
 const form = ref({ ...props.paciente })

@@ -13,18 +13,20 @@ async function handleResponse(res) {
 function fromApi(h) {
   if (!h) return h
   const { _id, fechaConsulta, mascota, createdAt, ...rest } = h
+  const mascotaObj = mascota && typeof mascota === 'object' ? mascota : null
   return {
     id: _id,
     // `<input type="date">` needs YYYY-MM-DD
     fecha: fechaConsulta ? String(fechaConsulta).slice(0, 10) : '',
-    mascotaId: mascota && typeof mascota === 'object' ? mascota._id : mascota ?? '',
+    mascotaId: mascotaObj ? mascotaObj._id : mascota ?? '',
+    mascotaNombre: mascotaObj ? mascotaObj.nombre : '',
     created_at: createdAt,
     ...rest, // motivo, diagnostico, tratamiento, veterinario
   }
 }
 
 function toApi(h) {
-  const { id, fecha, mascotaId, created_at, ...rest } = h
+  const { id, fecha, mascotaId, mascotaNombre, created_at, ...rest } = h
   return { ...rest, fechaConsulta: fecha, mascota: mascotaId } // motivo, diagnostico, tratamiento, veterinario
 }
 
@@ -33,6 +35,11 @@ function unwrap(payload) {
 }
 
 export const historialesService = {
+  async getAll() {
+    const res = await fetch(BASE_URL)
+    const data = await handleResponse(res)
+    return Array.isArray(data) ? data.map(fromApi) : []
+  },
   async getByMascota(mascotaId) {
     const res = await fetch(`${BASE_URL}/mascota/${mascotaId}`)
     const data = await handleResponse(res)

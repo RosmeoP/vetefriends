@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  getHistoriales,
   getHistorialesByMascota,
   getHistorialById,
   createHistorial,
@@ -9,6 +10,7 @@ import {
 
 const router = express.Router();
 
+router.get('/',                  getHistoriales);
 router.get('/mascota/:mascotaId', getHistorialesByMascota);
 router.get('/:id',               getHistorialById);
 router.post('/',                 createHistorial);

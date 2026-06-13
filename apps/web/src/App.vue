@@ -27,9 +27,10 @@
           :class="vistaActiva === 'propietarios' && 'nav-item-active'" class="nav-item">
           <Users class="w-4 h-4 flex-shrink-0" /> Propietarios
         </button>
-        <a href="#" class="nav-item">
+        <button type="button" @click="vistaActiva = 'historial'"
+          :class="vistaActiva === 'historial' && 'nav-item-active'" class="nav-item">
           <ClipboardPlus class="w-4 h-4 flex-shrink-0" /> Historial Médico
-        </a>
+        </button>
         <a href="#" class="nav-item">
           <Package class="w-4 h-4 flex-shrink-0" /> Inventario
         </a>
@@ -52,6 +53,7 @@
     <PacientesView v-if="vistaActiva === 'pacientes'" @ver-detalle="abrirDetalle" />
     <CitasView v-else-if="vistaActiva === 'citas'" />
     <PropietariosView v-else-if="vistaActiva === 'propietarios'" />
+    <HistorialMedicoView v-else-if="vistaActiva === 'historial'" />
     <DetalleMascota
       v-else-if="vistaActiva === 'detalle-mascota'"
       :mascota-id="mascotaDetalleId"
@@ -70,6 +72,7 @@ import {
 import PacientesView from './components/PacientesView.vue'
 import CitasView from './components/CitasView.vue'
 import PropietariosView from './components/PropietariosView.vue'
+import HistorialMedicoView from './components/HistorialMedicoView.vue'
 import DetalleMascota from './components/DetalleMascota.vue'
 
 const vistaActiva = ref('pacientes')

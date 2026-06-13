@@ -13,6 +13,8 @@
           </label>
           <input
             :id="field.id" :type="field.type" v-model="form[field.model]" :required="field.required"
+            :placeholder="field.placeholder ?? ''"
+            :maxlength="field.maxlength ?? undefined"
             class="border border-border rounded-lg px-3 py-2 text-sm bg-parchment text-ink outline-none focus:border-forest-mid focus:bg-white transition-colors" />
         </div>
 
@@ -42,11 +44,11 @@ const props = defineProps({
 const emit = defineEmits(['guardar', 'cancelar'])
 
 const fields = [
-  { id: 'nombreCompleto', label: 'Nombre completo', model: 'nombreCompleto', type: 'text',  required: true },
-  { id: 'dui',            label: 'DUI',              model: 'dui',            type: 'text',  required: true },
-  { id: 'telefono',       label: 'Teléfono',         model: 'telefono',       type: 'tel',   required: true },
-  { id: 'correo',         label: 'Correo electrónico',model: 'correo',         type: 'email', required: true },
-  { id: 'direccion',      label: 'Dirección',         model: 'direccion',      type: 'text',  required: true },
+  { id: 'nombreCompleto', label: 'Nombre completo',   model: 'nombreCompleto', type: 'text',  required: true, placeholder: 'Ej: Juan Carlos Pérez' },
+  { id: 'dui',            label: 'DUI',               model: 'dui',            type: 'text',  required: true, placeholder: 'Ej: 01234567-8', maxlength: 10 },
+  { id: 'telefono',       label: 'Teléfono',          model: 'telefono',       type: 'tel',   required: true, placeholder: 'Ej: 7123-4567', maxlength: 9 },
+  { id: 'correo',         label: 'Correo electrónico', model: 'correo',        type: 'email', required: true, placeholder: 'Ej: juan.perez@gmail.com' },
+  { id: 'direccion',      label: 'Dirección',          model: 'direccion',     type: 'text',  required: true, placeholder: 'Ej: Col. Escalón, Calle El Pedregal #12, San Salvador' },
 ]
 
 function normalizar(p) {
