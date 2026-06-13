@@ -99,9 +99,12 @@
             <Syringe class="w-4 h-4 text-ink-muted" />
             <span class="text-xs text-ink-muted">Capacidad de Cirugía</span>
           </div>
-          <div class="text-2xl font-extrabold text-ink mb-3">85%</div>
+          <div class="text-2xl font-extrabold text-ink mb-1">{{ capacidadCirugia.porcentaje }}%</div>
+          <div class="text-xs text-ink-muted mb-3">{{ capacidadCirugia.ocupados }} / {{ CAPACIDAD_MAX }} pacientes activos</div>
           <div class="h-2 bg-border rounded-full overflow-hidden">
-            <div class="h-full bg-forest-mid rounded-full" style="width: 85%"></div>
+            <div class="h-full rounded-full transition-all duration-500"
+              :class="capacidadCirugia.porcentaje >= 90 ? 'bg-red-500' : capacidadCirugia.porcentaje >= 60 ? 'bg-amber-400' : 'bg-forest-mid'"
+              :style="{ width: capacidadCirugia.porcentaje + '%' }"></div>
           </div>
         </div>
       </div>
