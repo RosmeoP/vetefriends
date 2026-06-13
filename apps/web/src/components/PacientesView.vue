@@ -176,6 +176,18 @@ let alertaTimer = null
 
 const ingresosHoy = computed(() => Math.min(pacientes.value.length, 24))
 
+const CAPACIDAD_MAX = 10
+const capacidadCirugia = computed(() => {
+  const activos = pacientes.value.filter((p) => {
+    const e = p.estado?.toLowerCase() ?? ''
+    return e === 'en cirugía' || e === 'hospitalizado' || e === 'emergencia'
+  }).length
+  return {
+    ocupados: activos,
+    porcentaje: Math.min(Math.round((activos / CAPACIDAD_MAX) * 100), 100),
+  }
+})
+
 const pacientesFiltrados = computed(() => {
   const q = busqueda.value.toLowerCase().trim()
   return pacientes.value.filter((p) => {
